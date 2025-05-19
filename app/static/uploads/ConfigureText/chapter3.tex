@@ -1,0 +1,145 @@
+\section{Debiasing Methods}
+In this chapter, we introduce various methods designed to mitigate bias in machine learning systems. These approaches are broadly categorized into three types, each targeting a different phase of the model lifecycle: 
+\begin{enumerate}
+\item Pre-processing methods focus on reducing bias in the training data before the model is trained.
+\item In-processing methods incorporate fairness considerations during the model training process such as modifying the learning algorithm or its objective function.
+\item Post-processing methods directly  adjust the model's predictions after training to achieve fairer outcomes.   
+\end{enumerate}
+\par Each category offers unique advantages and trade-offs, depending on the context and constraints of the application. 
+ 
+
+
+\subsection{Pre-processing methods}
+\subsubsection{Reweighing}
+\par At its core, the “reweighing” method \footnote{F. Kamiran and T. Calders. Data preprocessing techniques for classification without discrimination. Knowledge and information systems, 33(1):1–33, 2012.} assigns different weights to different subsets of data based on group membership regarding their protected attribute (e.g., male/female) and their ground truth labels (e.g., approved/denied). These weights help “rebalance” the influence of each data subset in the training process, especially when certain combinations of groups and outcomes are underrepresented or overrepresented.
+\par As shown in the loan approval example, there are far fewer female applicants than male applicants. This trend is true for both accepted and rejected loan applications. If we train a model directly on this dataset, it might learn that female applicants are less likely to be approved, not because they are less creditworthy, but simply because fewer loans are granted to women. Reweighing addresses this concern by giving more weight to the underrepresented group-outcome pairs (like qualified females), and less weight to overrepresented ones (like qualified males).
+\par One of the key advantages of reweighing is that it doesn’t change the input features or labels—it only adjusts how much each example “matters” during learning. This makes it easy to apply and compatible with a wide range of machine learning algorithms. While it may not eliminate all types of bias, it is often a powerful first step in ensuring fairer outcomes, especially when data imbalance is a major concern.
+
+\begin{VCSet}
+    \begin{visualComponent}
+        \name{PreProcess}
+        \type{Reweighing}
+    \end{visualComponent}
+    
+    \begin{visualComponent}
+        \name{MLPipeline}
+        \trainData{Reweighing}
+        \model{LR}
+    \end{visualComponent}
+
+    \begin{visualComponent}
+        \name{FairMetrics}
+        \metrics{SPD, DI, EOD, AOD}
+        \interaction{False}
+        \data{Reweighing}
+    \end{visualComponent}
+\end{VCSet}
+
+
+
+\subsubsection{Optimized Pre-processing}
+\par Optimized Preprocessing \footnote{F. Calmon, D. Wei, B. Vinzamuri, K. Natesan Ramamurthy, and K. R. Varshney. Optimized pre-processing for discrimination prevention. Advances in neural information processing systems, 30, 2017.} is another method designed to reduce bias in a dataset before training a machine learning model. Unlike simpler methods like reweighing, which only adjust the importance of different data points, Optimized Preprocessing actually modifies the features and labels in the training data. The idea is to generate a new version of the dataset that is more fair, while still keeping it as close as possible to the original data.  
+
+\par To do this, Optimized Preprocessing uses an algorithm that tries to balance multiple goals at once: making sure the new dataset is fairer (e.g., reducing the advantage that one group might have over another), ensuring that the data still helps the model learn accurate predictions, and avoiding extreme or unrealistic changes to the data. Optimized Preprocessing will yield a modified dataset that better reflects equal treatment across groups yet still teaches the model to make useful decisions.
+
+\par This method is especially useful when we suspect that the training data itself carries hidden biases—perhaps because of social or historical inequalities. By adjusting the data at the start, Optimized Preprocessing gives us a fairer starting point for model training. One limitation of Optimized Preprocessing is that it may require some trial and error to find the right balance between fairness and accuracy. 
+
+\begin{VCSet}
+    \begin{visualComponent}
+        \name{PreProcess}
+        \type{OptimPreproc}
+    \end{visualComponent}
+    
+    \begin{visualComponent}
+        \name{MLPipeline}
+        \trainData{OptimPreproc}
+        \model{LR}
+    \end{visualComponent}
+    
+    \begin{visualComponent}
+        \name{FairMetrics}
+        \metrics{SPD, DI, EOD, AOD}
+        \interaction{False}
+        \data{OptimPreproc}
+    \end{visualComponent}
+\end{VCSet}
+
+
+\subsection{In-processing methods}
+\subsubsection{Prejudice Remover}
+\par Prejudice Remover \footnote{T. Kamishima, S. Akaho, H. Asoh, and J. Sakuma. Fairness-aware classifier with prejudice remover regularizer. In Joint European conference on machine learning and knowledge discovery in databases, pages 35–50. Springer, 2012.} is an in-processing technique used to reduce bias during the training of a machine learning model.  The key idea behind Prejudice Remover is to encourage the model to learn patterns that are not only predictive but also fair. This is done by penalizing the model if its predictions are strongly dependent on sensitive attributes like gender or race. That is to say, the algorithm is guided to minimize both prediction error and unfairness.
+\par Imagine training a model that not only tries to make accurate predictions but also "pays attention" to whether it is treating different groups equitably. The more unfair the predictions are, according to a defined fairness metric, the higher the penalty. This pushes the model to find a balance between fairness and accuracy. 
+\par However, this method typically requires modifications to the model’s internal training process, which may not be possible for all algorithms or platforms. Additionally, because this strategy causes the model to simultaneously optimize two quantities (accuracy and fairness), the accuracy may be lower than if the model were only trained to optimize accuracy.
+
+\begin{VCSet}
+    \begin{visualComponent}
+        \name{MLPipeline}
+        \trainData{Original}
+        \model{PrejudiceRmv}
+    \end{visualComponent}
+    
+    \begin{visualComponent}
+        \name{FairMetrics}
+        \metrics{SPD, DI, EOD, AOD}
+        \interaction{False}
+        \data{PrejudiceRmv}
+    \end{visualComponent}
+\end{VCSet}
+
+\subsubsection{Adversarial Debiasing}
+Adversarial Debiasing \footnote{B. H. Zhang, B. Lemoine, and M. Mitchell. Mitigating unwanted biases with adversarial learning. In Proceedings of the 2018 AAAI/ACM Conference on AI, Ethics, and Society, pages 335–340, 2018.} is another in-processing technique. It is inspired by the concept of adversarial training in machine learning, where two models are trained together in a competitive setup.
+\par In adversarial debasing, two models are trained simultaneously. The first model, called the predictor, tries to learn to make accurate predictions from the data (e.g., whether someone should be approved for a loan). The second model, called the discriminator, tries to predict the sensitive attribute (like gender or race) from the output of the predictor. If the discriminator can guess the sensitive attribute based on the predictor, then the predictor’s output is likely still biased.
+\par During adversarial debasing, we train the predictor such that:
+\begin{enumerate}
+\item It can still predict the target label (e.g., loan approval) as accurately as possible.
+\item It hides or removes any information about the sensitive attribute from its outputs, making it hard for the discriminator to succeed.
+\end{enumerate}
+
+\par This creates a game between the two models:
+\begin{enumerate}
+\item The predictor wants to minimize prediction error while preventing the adversary from inferring the sensitive attribute.
+\item The discriminator wants to accurately guess the sensitive attribute from the predictor’s output.
+\end{enumerate}
+\par During training, the system tries to find a balance where the predictor does its job well but does not leak sensitive information, thereby reducing the chance of biased outcomes.
+\par Adversarial Debiasing directly tackles the root of the bias, that is, the relationship between sensitive features and model predictions. However,  it can be computationally expensive, and the setup can be harder to implement compared to simpler fairness strategies. 
+
+\begin{VCSet}
+    \begin{visualComponent}
+        \name{MLPipeline}
+        \trainData{Original}
+        \model{Adversarial}
+    \end{visualComponent}
+    
+    \begin{visualComponent}
+        \name{FairMetrics}
+        \metrics{SPD, DI, EOD, AOD}
+        \interaction{False}
+        \data{Adversarial}
+    \end{visualComponent}
+\end{VCSet}
+
+
+\subsection{Post-processing methods}
+Reject Option-Based Classification (ROC)\footnote{F. Kamiran, A. Karim, and X. Zhang. Decision theory for discrimination-aware classification. In 2012 IEEE 12th International Conference on Data Mining, pages 924–929, 2012.} is a post-processing method for improving fairness in machine learning models. Unlike pre-processing or in-processing methods, this technique does not change the data or the model itself. Instead, it works by adjusting the model’s predictions after training is complete.
+\par The core idea is as follows: When a machine learning model makes a prediction, it typically also produces a confidence score indicating how certain it is about that prediction. The final decision is made by comparing this score against a threshold or decision boundary (e.g., 0.5 in binary classification). Predictions with confidence scores close to this threshold—where the model is relatively uncertain—are considered to lie in a "gray area." These borderline cases are the focus of the reject option-based strategy.
+\par In this gray area, the algorithm applies a bias-aware decision rule: 
+\begin{enumerate}
+\item If the input belongs to the unprivileged group (e.g., female), and the model was about to predict an unfavorable outcome (e.g., loan denied), the algorithm flips the decision to a favorable one.
+\item Conversely, if the input belongs to the privileged group (e.g., male), and the model was about to predict a favorable outcome, the decision may be flipped to an unfavorable one.
+\end{enumerate}
+\par This adjustment is applied only to data whose outcomes are uncertain, which helps minimize the impact on overall accuracy. In doing so, the algorithm gives the benefit of the doubt to the unprivileged group—effectively increasing fairness without heavily distorting the model’s confident decisions.
+
+
+\begin{VCSet}
+    \begin{visualComponent}
+        \name{PostProcess}
+        \type{ROC}
+    \end{visualComponent}
+    
+    \begin{visualComponent}
+        \name{FairMetrics}
+        \metrics{SPD, DI, EOD, AOD}
+        \interaction{False}
+        \data{ROC}
+    \end{visualComponent}
+\end{VCSet}

@@ -1,0 +1,85 @@
+\section{Final Project}
+
+
+\par Now it is time to put what we have learned into action. For our final project, we will apply our debiasing knowledge towards a new problem that still pertains to banking. A term deposit is an investment that an individual can make in a bank. When somebody subscribes to a term deposit, they deposit money in the bank for a fixed period of time, and cannot withdraw the money during that time. In exchange, they receive a greater interest rate on their deposit. When a bank offers term deposits, it may naturally want to advertise its service using direct marketing (e.g. telemarketing). Direct marketing can be costly, so that bank would want to target individuals with a high likelihood of subscribing to the term deposit that they are offering. Such individuals can potentially be identified by using algorithmic decision making.
+
+\par In this chapter, we will design a prediction model to identify telemarketing leads who are more likely to subscribe to a term deposit offered by a bank. We will use the strategies that we have learned to ensure that the algorithm is not biased towards any particular class. In this case, we will consider marital status (married vs. unmarried) as the class of interest. 
+
+\par As data, we will use records of real marketing leads that were used by a bank offering term deposits to customers. For educational purposes, we modified the data to make the bias more pronounced. Each data point represents a potential client who was contacted via direct marketing. In each case, we track whether or not the client subscribed (yes) or did not subscribe (no) to the term deposit. For each data point, we have twelve variables storing different information about that client. We list the variables below:
+
+
+\begin{enumerate}
+    \item $age$: How old the client is, in years.
+    \item $job$: What category of job the client has.
+    \item $marital$: The marital status of the client (married or unmarried).
+    \item $education$: The highest education level of the client.
+    \item $default$: Whether or not the client has credit in default.
+    \item $housing$: Whether or not the client has a housing loan.
+    \item $loan$: Whether or not the client has a personal loan.
+    \item $contact$: Whether the phone used for telemarketing was a cell phone or a landline.
+    \item $month$: The month in which the client was contacted.
+    \item $day\_of\_week$: The day of the week when the client was contacted.
+    \item $duration$: The duration of the call when the client was contacted.
+    \item $y$: Whether or not the client subscribed to the term deposit (yes or no).
+\end{enumerate}
+
+\begin{visualComponent}
+    \name{Table}
+\end{visualComponent}
+
+\subsection{Setup}
+
+\par We will now set up our apparatus. As we have previously discussed, we must first split the data into training and testing data. We have already split the dataset for the user:
+\begin{VCSet}
+    \begin{visualComponent}
+        \name{Input}
+    \end{visualComponent} 
+
+\par Prior to debiasing, it is important to compute any bias within the data. We have computed statistical parity difference and disparate impact for the user. When computing these numbers, we set the “privileged” group as those who are married, and the “unprivileged” group as those who are unmarried. Here we can see that the data naturally favors those who are married.
+
+\begin{visualComponent}
+    \name{DataFairMetricsF}
+\end{visualComponent}
+
+\subsection{Final Project Activity}
+\par Below, we provide a tool that you can use to evaluate different models, along with training data that is altered according to the various debiasing strategies that we have discussed. In the panel below, choose one combination of a pre-processing debiasing strategy (top) and an in-processing debiasing strategy (bottom) and click submit. After that, a panel with a similar interface to before will appear, where you can train and evaluate the model that you selected.
+\par Experiment with different combinations of pre-processing and in-processing strategies. The fairness metrics and overall accuracies of every combination that you test will be stored in tables below. Every time that you test a combination, a new row will be added to both the accuracy table, and the fairness metrics table.
+\par Use this tool to answer the discussion questions below.
+\begin{visualComponent}
+    \name{TrainModelCustomize}
+\end{visualComponent}
+
+\begin{visualComponent}
+    \name{MLPipelineF}
+\end{visualComponent}
+
+\subsubsection{Fairness Metrics Table}
+\par Below, we provide a table that will show the fairness metrics for each combination of pre-processing and in-processing debiasing strategies that you test. The table will be updated every time you test a new combination.
+\begin{visualComponent}
+    \name{FairMetricsF}
+\end{visualComponent}
+
+\subsubsection{Accuracy Table}
+\par Below, we provide a table that will show the accuracy for each combination of pre-processing and in-processing debiasing strategies that you test. The table will be updated every time you test a new combination.
+\begin{visualComponent}
+    \name{AccuracyF}
+\end{visualComponent}
+
+\end{VCSet}
+
+\subsection{Questions}
+
+\begin{enumerate}
+\item From an initial glance at the training data set, does there appear to be a difference between how frequently married and unmarried people subscribe to the term deposit?
+
+\item Using fairness metrics, what kind of bias do you notice for married people in the data?
+
+\item Run a standard logistic regression on the data. What is the accuracy of the model? Is there any bias towards married or unmarried people?
+
+\item Try different pre-processing debiasing strategies. Which strategy was the most effective? What effect did that strategy have on the overall accuracy?
+
+\item Try different in-processing debiasing strategies. Which strategy was the most effective? What effect did that strategy have on the overall accuracy?
+
+\item Try different combinations of pre-processing and in-processing debiasing strategies. Which combination was the most effective? What effect did that combination have on the overall accuracy?
+    
+\end{enumerate}

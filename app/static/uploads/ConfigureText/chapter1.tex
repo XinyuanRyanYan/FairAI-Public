@@ -1,0 +1,162 @@
+\section{Machine Learning Algorithms and Fairness}
+
+\subsection{Algorithmic Bias}
+\par Any time an important decision is made that affects different groups of people, it is important that the decision is fair. If, during a baseball game, the umpire gives preferential treatment to one team over the other, then the integrity of the game is compromised. When decisions are made by algorithms, fairness is just as important. 
+
+\par When designing algorithms for making decisions, it is possible that unforeseen circumstances may lead to the algorithm exhibiting bias under certain conditions. Unfortunately, there are many well documented cases of algorithms yielding different results on members of different classes. We give three examples below, although many similar cases have been observed.
+\begin{enumerate}
+    \item In order to decide on bail amounts, courtrooms have employed algorithms to discern which defendants pose a flight risk. When past risk scores are compared against the crimes committed by defendants after their risk score was assigned, it can be demonstrated that such algorithms overpredicted the risk posed by Black defendants, and underpredicted the risk posed by White defendants\footnote{https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing}.
+    \item Amazon designed a hiring tool to flag the resumes of promising applicants. It designed the tool to identify resumes that were similar to those of employees hired over the past ten years. In doing so, the algorithm penalized applicants for being female, as the majority of the applicants who had previously been hired were male. Fortunately, this bias was detected during a trial phase, and the tool was not used for actual hiring\footnote{https://www.reuters.com/article/world/insight-amazon-scraps-secret-ai-recruiting-tool-that-showed-bias-against-women-idUSKCN1MK0AG/}.
+    \item A 2018 study found that software designed to determine one’s gender from an image of one’s face, light skinned males were identified correctly over 99\% of the time, while dark skinned females were identified correctly as little as 66\% of the time.\footnote{https://www.media.mit.edu/publications/gender-shades-intersectional-accuracy-disparities-in-commercial-gender-classification/}
+\end{enumerate}
+
+
+\subsubsection{Why Algorithmic Bias is Important}
+\par If a class of people makes up a relatively low percentage of the overall population, then the accuracy of an algorithm on members of that class will not have much effect on the overall accuracy. As a result, an algorithm that exhibits low accuracy with respect to that class may still yield a very high accuracy overall. However, even if such biases have minimal effect on the overall accuracy, there are many reasons why it is still important to have fair algorithms overall. We now list a few:
+
+
+\par \textbf{Ethical Risk.} It is often ethically important to ensure that the results of decision-making algorithms are as accurate as possible. For example, in the first example presented above, the output of the algorithm could influence a judge to falsely jail an individual on the basis of their race. Any such occurrence is a significant tragedy, and developers are ethically obligated to ensure that such cases occur as infrequently as possible.
+\par \textbf{Legal Risk.} In many cases, discriminating on the basis of certain protected classes is prohibited by federal law. For example, the Civil Rights Act of 1964 prohibits hiring discrimination on the basis of gender. In the second example presented above, if a hiring algorithm were shown to discriminate unfairly on the basis of gender, then the usage of that algorithm may be deemed illegal.
+\par \textbf{Reputational Risk.} The success of private organizations depends on the trust of the public. Many people already have a natural distrust of algorithmic decision making, and instead prefer human arbitrators. If an organization is deemed to employ unfair algorithms, customers may lose trust in the organization, and be less likely to do business. Significant research has demonstrated that when the public negatively perceives the action of an organization, it will weigh this action more heavily than several positively perceived actions.
+
+\subsubsection{Why not just exclude protected attributes from the algorithms?}
+\par One immediately obvious solution to algorithmic bias is to prevent a decision-making algorithm from accessing any sensitive information, and only allow it to access information that is relevant to the decision at hand. However, this solution is not easily implemented. For example, in the case of Amazon’s hiring, the algorithm was not given direct access to the applicants’ gender. However, the algorithm favored certain attributes of resumes that correlated with gender, yet had nothing to do with job qualification. For instance, compared to women, men are more likely to use certain action verbs, like “executed,” on their resume. As a result, the resumes of previous hires contained these action verbs more frequently, and female applicants, who are less likely to use these verbs, were less likely to be recommended.
+
+\par Despite their best efforts, Amazon developers were unable to guarantee that their algorithm did not discriminate on the basis of high-level correlations, such as the gender discrepancy in action verb usage. This fact contributed to the company’s eventual decision to scrap the algorithm entirely.
+
+\subsection{Machine Learning}
+
+\par Abstractly speaking, an algorithm is a procedure one can follow to obtain an output from a set of inputs. The standard strategy for adding two integers using pen and paper is an example of an algorithm. Here the input is the two numbers, and the output is their sum. The algorithm is the procedure that one follows to transform the inputs into the output. In modern discourse, algorithms are typically discussed in the context of computers. Computers carry out step-by-step instructions to derive some output from an input.
+\par Machine learning (ML) is a strategy that can be used to produce new algorithms. Machine learning produces algorithms to accomplish a task by analyzing examples. Thus, in order to design an algorithm with ML, one must provide lots of examples of the task that they are trying to automate. For example, to design an algorithm using ML to identify a person’s gender from a picture of their face, one would need to provide examples of facial images labeled according to gender.
+\par Machine learning strategies produce algorithms that can transform the sample inputs into the sample outputs. When ML is used well, the algorithms produced this way will also generalize to other data, and not just the examples provided.
+\par One example of an ML strategy is linear regression. When using linear regression, one provides the algorithm with sample points of the form (x,y). From these inputs, linear regression produces a best-fit line that can be used to approximately transform each x into its corresponding y. Once the best-fit-line is produced, it can be used to predict the y value at any x coordinate, and not just the x coordinates of the sample points. There are many other ML strategies. In the rest of this chapter, we will focus on a strategy called logistic regression.
+\par The example data that is used by ML to produce an algorithm is called the training data. The process of learning an algorithm from the training data is called training. During training, the algorithm is called the model. Typically, one starts with a randomized model. Then, during training, they incrementally adjust the model until it is suitable for their needs.
+
+
+\subsubsection{Types of Data}
+\par Many different types of data can be used for machine learning. In general, machine learning works best with \textbf{structured data}, in which data is organized in a list or grid format. Some examples of structured data are lists, vectors, matrices, or spreadsheets. Sometimes, one may need to work with \textbf{unstructured data}. One example of unstructured data is a set of images of different sizes. There is no obvious way to represent all of the information in the images in a single list or matrix. Another common example of unstructured data is text. Typically, when working with unstructured data, one must find an elegant way to represent the data in a structured format.
+\par There are many categories of data. We list some common types below:
+\par \textbf{Categorical Data} represents different classifications that are not numeric in nature. For example, one’s gender may be assigned as either male or female. This assignment is categorical because neither gender is fundamentally a number. In practice, because all computer data is actually numeric, a unique number will be assigned to each category when representing categorical data (e.g. male = 0 and female = 1). Categorical data can be further classified:
+\begin{enumerate}
+    \item \textbf{Ordinal Data} is a type of categorical data that has a fundamental order. For example, one’s shirt size may be “small,” “medium,” or “large.” Those sizes can be ordered, even though none of them is fundamentally a number.
+    \item \textbf{Nominal Data} is categorical data that is not ordinal. For example, there is no way of ordering male versus female, so gender is nominal and not ordinal.
+\end{enumerate}
+
+\par \textbf{Numeric Data} is, not surprisingly, data that takes the form of numbers. One common example is age. One’s age is often represented as the number of years that have passed since they were born (rounded down). There are two main types of numeric data.
+\begin{enumerate}
+    \item \textbf{Ratio Data} is data whose ratios have a meaningful interpretation. Age is an example of ratio data. A person who is four years old has been alive twice as long as a person who is two years old.
+    \item \textbf{Interval Data} is data whose ratios do not have a meaningful interpretation. Temperature in degrees Farenheit is an example of interval data. Scientifically speaking, an object whose temperature is 50°F is not “twice as hot” as an object whose temperature is 25°F.
+\end{enumerate}
+
+\par \textbf{Panel Data} measures how one or more quantities vary over time. For instance, information about the quantity and brand of coffee consumed by a person each day is an example of panel data.
+
+
+
+
+\subsection{An Example Through a Case Study}
+\par For the rest of this module (except for the final project), we will study AI fairness through a case study. In particular, we will analyze how an algorithm designed to approve or deny bank loans can be biased towards or against certain classes. In the remainder of this chapter, we will:
+\begin{enumerate}
+    \item Learn about the context of bank loan approval.
+    \item Inspect the bank loan dataset that we will use in this case study.
+    \item Use logistic regression to obtain a prediction algorithm from the data.
+    \item Learn about how prediction models work, and how to evaluate them.
+\end{enumerate}
+
+\par In later chapters, we will:
+\begin{enumerate}
+    \item Further examine whether the model is fair, in addition to being accurate overall (ch. 2).
+    \item Analyze any potential causes of unfairness (ch. 2).
+    \item Learn about techniques that can be used to remove bias in the algorithm (ch. 3).
+\end{enumerate}
+
+
+\subsubsection{Loan Approval}
+\par One way that banks make money is by lending out money with interest. Whenever money is loaned out, there is some risk that the borrower will not be able to return the money. In such an event, the bank would incur loss. Therefore, any time that a loan is proposed to a bank, the bank will evaluate the likelihood that the borrower will return the money, and accept or reject the proposal accordingly. The process of evaluating loan proposals is called credit underwriting.
+\par It is important for the bank to accurately assess each loan application. If it is too lenient with accepting loans, too many borrowers may default, leading to financial difficulties. On the other hand, if a bank is too strict, it may not grant very many loans, and thus make less profit.
+\par The process of credit underwriting is time consuming and expensive. As such, several organizations have experimented with using algorithms to aid with credit underwriting. In our case, we will use logistic regression to develop an algorithm to assist with credit underwriting. The input of the algorithm will be information about a proposed loan. The output of the algorithm will be whether the proposed loan should be approved or denied. We will represent these outcomes internally by the numbers 1 and 0, respectively.
+\par Because logistic regression is a form of ML, we will use training data in order to train a model, and eventually obtain a final algorithm. Our training data corresponds to a collection of previous loan applications, classified according to whether they were approved or denied. Below, we list the attributes associated with each loan application. If an attribute is categorical, we will list the number that we associate with that category in parentheses.
+\begin{enumerate}
+    \item Response: Whether the loan was approved (1) or denied (0).
+    \item Gender: Male (1) or Female (0).
+    \item Employment: Employed (1) or Unemployed (0).
+    \item Dependents: How many dependents the applicant has.
+    \item Age: The age of the applicant.
+    \item Amount: How much money is requested by the applicant.
+\end{enumerate}
+
+\par Here is a table to represent the list of applications. Because the data can be represented in a single table, it is considered to be structured data.
+\begin{visualComponent}
+    \name{Table}
+\end{visualComponent}
+
+
+
+
+\subsubsection{Logistic Regression}
+
+\par Linear regression is a process that will always return the equation of a line. Thus, the output of linear regression is one member of the family of functions of lines. Similarly, the output of logistic regression will always be a member of the family of logistic functions. We describe how we evaluate a logistic function now.
+\par A logistic function takes, as input, some vector $(x_1,x_2,\ldots,x_n)$, where each entry $x_i$ in the vector corresponds to one of the input variables. To evaluate any logistic function, one must first compute the number $y$ according to the following formula:
+
+$$ y = \sum_{i=1}^n \alpha_i x_i + \epsilon $$
+\par Here, each $\alpha_i$ is a weight that is assigned to each input variable. Certain $\alpha_i$ may be given higher values to indicate that the corresponding input $x_i$ is more important with respect to the decision. When training the model, values for the $\alpha_i$ will be learned so that the outputs of the logistic regression equation are consistent with the training data
+\par Once $y$ is computed, the value is transformed so that it is within the range (0,1). This is accomplished by plugging $y$ into the sigmoid function:
+$$ \sigma(y) = \frac{1}{1+e^{-y}} $$
+
+\par Thus, every logistic function will output some value between zero and one. However, whether or not a loan is approved is fundamentally categorical. There are only two possible values for loan approval: accept (1), or reject (0). In order to work with categorical data, we will implement our logistic regression algorithm so that it outputs the probability that a loan should be approved. If the function outputs a probability above 50%, we will accept the loan. Otherwise, we will reject it.
+
+
+
+\subsubsection{Evaluating Our Model}
+\par The math behind training models in ML is quite complex, and is outside of the scope of this module. After training a model, one should typically test how well that model generalizes to new data that was not used for training. However, if one uses all of their data for training, then they will not have any data left for such testing. It is therefore the standard practice in ML to divide up the data into training data and test data, where the latter is used to evaluate the model’s generalization to new data.
+\par In order to use test data, one runs their model on only the input variables of the test data. In our case, we evaluate the model using all variables except for whether or not the loan was approved or denied. Then, we see whether the decision produced by the model - whether to accept or deny the loan application - matches the original decision featured in the data. The decision of whether the original loan application was approved or denied is called the ground truth.
+\par In the example below, we provide you with the ability to play around with different logistic regression models. In this very simple example, the only variable that is considered when making the decision is the credit score of the applicant. On the left side, you can modify the training and test data by moving around the orange and blue dots. Here an orange dot means a loan that is accepted, and a blue dot means one that is denied. Once you have chosen training and test data to try out, click “train model” to train the model, and then “evaluate model” to see how it performs on the test data.
+
+\begin{visualComponent}
+    \name{LRExplainer}
+\end{visualComponent}
+
+\par When evaluating a decision-making algorithm, the accuracy is often reported as the percentage of decisions that were made correctly. For instance, one might report that our model’s prediction matched the ground truth 80\% of the time. 
+\par However, one number may not tell the entire story. For example, suppose that 99\% of loans in the ground truth are supposed to be approved. If our algorithm automatically approved all loans, then it would be 99\% accurate! However, clearly an algorithm that automatically approves every loan is not a very strong decision-making algorithm. Therefore, when we evaluate our decision-making algorithm, it is important that we separately analyze how well the algorithm performs on loans that should be approved versus denied.
+\par In order to further disaggregate our model’s accuracy, we introduce some classification terms:
+\begin{enumerate}
+\item True positives (TP) are loans that were correctly approved by our algorithm.
+\item False positives (FP) are loans that were approved by our algorithm, but should have been denied.
+\item True negatives (TN) are loans that were correctly denied by our algorithm.
+\item False negatives (FN) are loans that were denied by our algorithm, but should have been approved.
+\end{enumerate}
+
+\par We can compute the number of each of the above cases, and organize them into a \textbf{confusion matrix}.
+\begin{figure}
+    \name{confusion-matrix.png}
+    \caption{1. Confusion Matrix}
+\end{figure}
+\par Using the confusion matrix, one can easily compute several important metrics about their model’s accuracy, such as:
+\begin{enumerate}
+\item The overall accuracy, which is defined as
+		$$ \frac{\text{TP} + \text{TN}}{\text{TOTAL SAMPLE}} $$
+\item The sensitivity, which is the accuracy of the model on loans that should be accepted. This is defined as:
+		$$ \frac{\text{TP}}{\text{TP}+\text{FN}} $$
+\item The specificity, which is the accuracy of the model on loans that should be rejected. This is defined as:
+		$$\frac{\text{TN}}{\text{TN}+\text{FP}} $$
+\end{enumerate}
+\par Finally, to get a small taste of the following chapters, we will describe one way of analyzing how a model performs across different classes. We can analyze how a model performs across different classes by computing a confusion matrix for each class. Below we provide a tool to analyze the confusion matrix for our logistic regression model across different classes of people. At the top of the panel, you can choose which variables you would like to consider as inputs for the logistic regression model. You can also choose how much data you would like to use for training versus for testing. After you generate the data, another panel will appear below allowing you to train and evaluate the model. Click “train model” to train the logistic regression model. Then, click “evaluate model” to evaluate the results. After you do so, a confusion matrix for both men and women will be displayed.
+
+\begin{VCSet}
+    \begin{visualComponent}
+        \name{CustomizeData}
+    \end{visualComponent}
+
+    \begin{visualComponent}
+        \name{MLPipeline}
+        \trainData{Original}
+        \model{LR}
+    \end{visualComponent}
+\end{VCSet}
+
+
+
+
+
+
+
+

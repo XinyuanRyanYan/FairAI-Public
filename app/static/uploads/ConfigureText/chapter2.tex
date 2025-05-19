@@ -1,0 +1,175 @@
+\section{Fairness Metrics and Sources of Bias}
+\par In this chapter, we will explore how to quantitatively measure fairness in model predictions, with a specific focus on binary classification models.  
+
+\subsection{Fairness Metrics}
+\par In the previous chapter, we used a logistic regression model to predict whether a loan applicant should be approved based on various personal attributes. We also visualized the model’s predictions using confusion matrices for two groups: male (privileged) and female (unprivileged) applicants. The figure below illustrates an example of such model outcomes.
+\begin{figure}
+    \name{loan-confusion-matrix.png}
+    \caption{1. Confusion matrices for the loan prediction.}
+\end{figure}
+\par But this raises an important question: How can we quantify whether the model is biased against the unprivileged group? Over the years, researchers have proposed several metrics to address this issue. However, it has also been shown that these fairness metrics can be incompatible with each other—meaning that optimizing for one may lead to violations of another. Therefore, the choice of metric should depend on the specific application and context.
+\par In this section, we will introduce four widely used fairness metrics, all of which are derived from the confusion matrices. 
+
+\subsubsection{Preliminaries}
+\par In the following, we consider the \textbf{female group} as the \emph{unprivileged group} and the \textbf{male group} as the \emph{privileged group}. The model's prediction is denoted by $Y$, where:  $Y=1$ indicates a positive outcome (e.g., loan approval), and  $Y=0$ indicates a negative outcome (e.g., loan denial). We use the standard confusion matrix terminology for each group:
+\begin{itemize}
+    \item \textbf{TP (True Positive)}: The model correctly predicts a positive outcome.
+    \item \textbf{FN (False Negative)}: The model incorrectly predicts a negative outcome.
+    \item \textbf{FP (False Positive)}: The model incorrectly predicts a positive outcome.
+    \item \textbf{TN (True Negative)}: The model correctly predicts a negative outcome.
+\end{itemize}
+
+\par We will now describe the four metrics. Each metric uses the entries of the confusion matrices of each class in order to output a single number.
+
+\subsubsection{Statistical Parity Diﬀerence (SPD)}
+SPD measures whether the overall rate of favorable outcomes (e.g., loan approvals) is the same across different groups defined by the protected attribute. It answers the question: Are individuals from both groups equally likely to receive a positive prediction.
+\par \textbf{Mathematical formula:}
+$$
+\text{SPD} = P(Y = 1 \mid \text{unprivileged}) - P(Y = 1 \mid \text{privileged})
+$$
+
+\par Now, let's calculate the SPD using the confusion matrices for the loan example.
+\par \textbf{For females:}
+$$
+P(Y = 1 \mid \text{female}) = \frac{TP_F + FP_F}{TP_F + FP_F + FN_F + TN_F} = \frac{25 + 9}{25 + 9 + 2 + 6} = \frac{34}{42} \approx 0.81
+$$
+
+\textbf{For males:}
+$$
+P(Y = 1 \mid \text{male}) = \frac{TP_M + FP_M}{TP_M + FP_M + FN_M + TN_M} = \frac{62 + 22}{62 + 22 + 1 + 1} = \frac{84}{86} \approx 0.977
+$$
+
+\textbf{Statistical Parity Difference:}
+$$
+\text{SPD} = 0.81 - 0.977 = -0.167
+$$
+\par \textbf{Interpretation}: The negative SPD means the female group is less likely to be approved than the male group. 
+
+
+
+\subsubsection{Disparate Impact(DI)}
+DI compares the rates of favorable outcomes between groups. It is computed similarly to SPD, except that instead of taking the difference between the rate of favorable outcomes between groups, it takes their ratio.
+
+\par \textbf{Mathematical formula:}
+$$
+\text{DI} = \frac{P(Y = 1 \mid \text{unprivileged})}{P(Y = 1 \mid \text{privileged})}
+$$
+
+\par Now, let's calculate the DI using the confusion matrices for the loan example.
+
+\par \textbf{For females:}
+$$
+P(Y = 1 \mid \text{female}) = \frac{TP_F + FP_F}{TP_F + FP_F + FN_F + TN_F} = \frac{34}{42} \approx 0.81
+$$
+
+\textbf{For males:}
+$$
+P(Y = 1 \mid \text{male}) = \frac{TP_M + FP_M}{TP_M + FP_M + FN_M + TN_M} = \frac{84}{86} \approx 0.977
+$$
+
+\textbf{Disparate Impact:}
+$$
+\text{DI} = \frac{0.81}{0.977} \approx 0.829
+$$
+
+\par \textbf{Interpretation}:A DI below 1 means the female group is less likely to be approved than the male group. 
+
+
+\subsubsection{Equal Opportunity Diﬀerence (EOD)}
+EOD focuses on whether qualified individuals (i.e., those who should be approved) are treated equally across groups. It compares the true positive rates (TPR) of each group.
+\par \textbf{Mathematical formula:}
+$$
+\text{EOD} = TPR_{\text{unprivileged}} - TPR_{\text{privileged}}
+$$
+where
+$$
+TPR = \frac{TP}{TP + FN}
+$$
+
+\par Now, let's calculate the DI using the confusion matrices for the loan example.
+
+\textbf{For females:}
+$$
+TPR_{\text{female}} = \frac{TP_F}{TP_F + FN_F} = \frac{25}{25 + 2} = \frac{25}{27} \approx 0.926
+$$
+
+\textbf{For males:}
+$$
+TPR_{\text{male}} = \frac{TP_M}{TP_M + FN_M} = \frac{62}{62 + 1} = \frac{62}{63} \approx 0.984
+$$
+
+\textbf{Equal Opportunity Difference:}
+$$
+\text{EOD} = 0.926 - 0.984 = -0.058
+$$
+
+\par \textbf{Interpretation}: A negative EOD indicates that the unprivileged group (female) is less likely than the privileged group (male) to receive a favorable prediction when they deserve it (i.e., when they actually qualify).
+
+
+\subsubsection{Average Odds Diﬀerence (AOD)}
+AOD is like EOD, but goes one step further. It considers both the true positive rate (qualified people being approved) and the false positive rate (unqualified people being mistakenly approved). This gives it a more balanced view of fairness.  
+\par Mathematical formula: 
+\par \textbf{Mathematical formula:}
+$$
+\text{AOD} = \frac{1}{2} \left[ \left( TPR_{\text{unprivileged}} - TPR_{\text{privileged}} \right) + \left( FPR_{\text{unprivileged}} - FPR_{\text{privileged}} \right) \right]
+$$
+
+Where:
+$$TPR = \frac{TP}{TP + FN}$$
+$$FPR = \frac{FP}{FP + TN}$$
+
+\textbf{From the confusion matrices:}
+
+\textbf{For females:}
+$$
+TPR_{\text{female}} = \frac{25}{25 + 2} = \frac{25}{27} \approx 0.926
+$$
+$$
+FPR_{\text{female}} = \frac{9}{9 + 6} = \frac{9}{15} = 0.600
+$$
+
+\textbf{For males:}
+$$
+TPR_{\text{male}} = \frac{62}{62 + 1} = \frac{62}{63} \approx 0.984
+$$
+$$
+FPR_{\text{male}} = \frac{22}{22 + 1} = \frac{22}{23} \approx 0.957
+$$
+
+\textbf{Average Odds Difference:}
+$$
+\text{AOD} = \frac{1}{2} \left[ (0.926 - 0.984) + (0.600 - 0.957) \right] = \frac{1}{2} \left[ -0.058 - 0.357 \right] = \frac{-0.415}{2} = -0.208
+$$
+
+\par \textbf{Interpretation}:A negative AOD value indicates that the model favors the privileged group (male) in true and false predictions overall.
+
+\par Below, we provide an interactive tool to explore the different fairness metrics. On the top are the confusion matrices for each group, and on the bottom are panels displaying four fairness metrics. Each metric panel shows the metric value and the corresponding bias level. Clicking on a metric panel will reveal the formula used to calculate it. You can double-click any number in the confusion matrix to modify it, then press the Enter key to see how the updated values affect the fairness metrics.
+
+\begin{visualComponent}
+    \name{FairMetrics}
+    \metrics{SPD, DI, EOD, AOD}
+    \interaction{True}
+    \data{Original}
+\end{visualComponent}
+
+
+\subsection{Source of Bias}
+AI systems sometimes make biased outcomes, so it is natural to ask why such outcomes occur. These biases may arise during each stage of the machine learning pipeline. Below are some common sources of bias: 
+
+
+\subsubsection{Historical Bias}
+Bias can exist in the data used in the model training process. Historical bias reflects the real-world inequalities that have shaped the data. For example, if a group has received unfair treatment in the past (e.g., women were less likely to be approved for loans), this treatment will skew the training data. As a result, such biases will be reflected in the model's predictions.
+
+
+\subsubsection{Representation Bias}
+If most of the training examples come from one demographic group, the model may not generalize well to other groups. For instance, if a facial recognition model is trained primarily on images of men, it may not generalize well to recognizing pictures of women.
+
+
+\subsubsection{Measurement Bias}
+Sometimes, certain features in a dataset, such as zip code, may indicate whether or not one belongs to a protected class. Thus, even if sensitive information is hidden, these proxy variables provide an opportunity for models to exhibit bias. 
+
+\subsubsection{Algorithmic Bias} 
+\par If the learning objective of a model is not explicitly designed to be equally accurate between groups, then biased outcomes are more likely to occur.
+
+\subsubsection{Deployment Bias}
+The way a model is applied in the real world may differ from how it was designed or tested. A system trained for one environment (e.g., a large national bank) might behave unfairly when used in a different context (e.g., a local credit union). This issue is especially relevant if the real world data used during deployment is demographically different from the training data.

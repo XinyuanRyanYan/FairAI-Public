@@ -1,0 +1,14 @@
+/* This panel is used to customize the train and test data */
+@import url(../global.css);
+
+/*the entire div and two parts*/
+.assignment-input{
+    height: auto;
+    display: flex;
+    justify-content: space-evenly;
+    align-items:end;
+}
+
+.faiMetricsFDiv .metricTitle, .faiMetricsFDiv .titleBBor{
+    font-family: 'font1';
+}
