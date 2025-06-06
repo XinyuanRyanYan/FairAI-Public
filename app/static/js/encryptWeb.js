@@ -16,42 +16,44 @@ let renderChapterObj = '';      // render the chapter handler
  * @returns null
  */
 async function validateWeb() {
-    // test if it's reload page
-    let reloadPage = sessionStorage.getItem('pageHasBeenLoaded');
-    if (reloadPage) {
-        VALID = true;
-        activateWeb();
-        return '';
-    }
+    VALID = true;
+    activateWeb();
+    // // test if it's reload page
+    // let reloadPage = sessionStorage.getItem('pageHasBeenLoaded');
+    // if (reloadPage) {
+    //     VALID = true;
+    //     activateWeb();
+    //     return '';
+    // }
 
-    // if not, ask to enter password
-    let testNum = 1;
-    let pass = prompt('Please Enter Your Password',' ');
-    while (testNum < 5) {
-        if (!pass) { history.go(-1) };
-        let res = '';
-        await axios.post('/verifyPwd', {pwd: pass.toLowerCase()})
-            .then((response)=>{
-                res = response.data['res'];
-            })
-            .catch((error)=>{
-                console.log(error);
-            });
-        if (res == "yes") {
-            VALID = true
-            break;
-        } 
-        testNum += 1;
-        pass = prompt('Access Denied - Password Incorrect, Please Try Again.','Password');
-    }
-    // test if successfully validate
-    if(VALID){
-        activateWeb();
-        sessionStorage.setItem('pageHasBeenLoaded', 'true');
-    }
-    else{
-        history.go(-1);
-    }
+    // // if not, ask to enter password
+    // let testNum = 1;
+    // let pass = prompt('Please Enter Your Password',' ');
+    // while (testNum < 5) {
+    //     if (!pass) { history.go(-1) };
+    //     let res = '';
+    //     await axios.post('/verifyPwd', {pwd: pass.toLowerCase()})
+    //         .then((response)=>{
+    //             res = response.data['res'];
+    //         })
+    //         .catch((error)=>{
+    //             console.log(error);
+    //         });
+    //     if (res == "yes") {
+    //         VALID = true
+    //         break;
+    //     } 
+    //     testNum += 1;
+    //     pass = prompt('Access Denied - Password Incorrect, Please Try Again.','Password');
+    // }
+    // // test if successfully validate
+    // if(VALID){
+    //     activateWeb();
+    //     sessionStorage.setItem('pageHasBeenLoaded', 'true');
+    // }
+    // else{
+    //     history.go(-1);
+    // }
 
     return '';
 } 
